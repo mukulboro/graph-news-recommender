@@ -1,0 +1,26 @@
+{
+  "onlinekhabar": {
+    "homepage": "https://www.onlinekhabar.com",
+    "national_url": "https://www.onlinekhabar.com/content/news/rastiya",
+    "intl_url": "https://www.onlinekhabar.com/content/international",
+    "finance_url": "https://www.onlinekhabar.com/business",
+    "entertainment_url": "https://www.onlinekhabar.com/entertainment",
+    "sports_url": "https://www.onlinekhabar.com/sports"
+  },
+  "ratopati": {
+    "homepage": "",
+    "national_url": "",
+    "intl_url": "",
+    "finance_url": "",
+    "entertainment_url": "",
+    "sports_url": ""
+  },
+  "setopati": {
+    "homepage": "",
+    "national_url": "",
+    "intl_url": "",
+    "finance_url": "",
+    "entertainment_url": "",
+    "sports_url": ""
+  }
+}
