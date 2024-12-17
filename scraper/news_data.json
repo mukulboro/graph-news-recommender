@@ -8,12 +8,21 @@
     "sports_url": "https://www.onlinekhabar.com/content/sports"
   },
   "ratopati": {
-    "homepage": "",
-    "national_url": "",
-    "intl_url": "",
-    "finance_url": "",
-    "entertainment_url": "",
-    "sports_url": ""
+    "homepage": "https://www.ratopati.com/",
+    "koshi_url": "https://koshi.ratopati.com/province/1/",
+    "madhesh_url": "https://madhesh.ratopati.com/province/2/",
+    "bagmati_url": "https://bagmati.ratopati.com/province/3/",
+    "gandaki_url": "https://gandaki.ratopati.com/province/4/",
+    "lumbini_url": "https://lumbini.ratopati.com/province/5/",
+    "karnali_url": "https://karnali.ratopati.com/province/6/",
+    "sudurpashchim_url": "https://sudurpashchim.ratopati.com/province/7/",
+    "intl_url": "https://www.ratopati.com/category/international",
+    "finance_url": "https://www.ratopati.com/category/economy",
+    "entertainment_url": "https://www.ratopati.com/category/entertainment",
+    "npl_url": "https://www.ratopati.com/category/nepal-premier-league",
+    "sportsSpecial_url": "https://www.ratopati.com/category/sport-interview",
+    "cricket_url": "https://www.ratopati.com/category/cricket",
+    "football_url": "https://www.ratopati.com/category/football"
   },
   "setopati": {
     "homepage": "",
