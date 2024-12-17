@@ -7,6 +7,11 @@ class OnlinekhabarScraper(NewsScraper):
         super().__init__()
         self.news_data = self._NewsScraper__load_json_data()
         self.webpages_data = self._NewsScraper__scrape_websites(self.news_data["onlinekhabar"])
+    
+    def __parse_publication_date(self, date_str:str):
+        year, month, _, date, __, ___= date_str.split(" ")
+        unix_timestamp = self._NewsScraper__parse_nepali_date("onlinekhabar",year, month, date)
+        return unix_timestamp
 
     def __get_breaking_news(self):
         breaking_page:bs4.BeautifulSoup = self.webpages_data["homepage"]
@@ -25,13 +30,15 @@ class OnlinekhabarScraper(NewsScraper):
                 news_soup = bs4.BeautifulSoup(response.text, "html.parser")
                 featured_image = ((news_soup.find("div", {"class":"post-thumbnail"})).find("img").attrs["src"]).strip()
                 top_paragraph = (news_soup.find("div", {"class":"ok18-single-post-content-wrap"}).find("p").get_text()).strip()
+                published_date = news_soup.find("div", {"class":"ok-news-post-hour"}).find("span").get_text().strip()
+                news_item["published"] = self.__parse_publication_date(published_date)
                 news_item["description"] = top_paragraph
                 news_item["title"] = headline
                 news_item["url"] = headline_link
                 news_item["image"] = featured_image
                 breaking_news_list.append(news_item)
             except BaseException as e:
-                continue
+                print(e)
         return breaking_news_list
     
     def __get_business_news(self):
@@ -55,6 +62,8 @@ class OnlinekhabarScraper(NewsScraper):
                 news_soup = bs4.BeautifulSoup(response.text, "html.parser")
                 featured_image = ((news_soup.find("div", {"class":"post-thumbnail"})).find("img").attrs["src"]).strip()
                 top_paragraph = (news_soup.find("div", {"class":"ok18-single-post-content-wrap"}).find("p").get_text()).strip()
+                published_date = news_soup.find("div", {"class":"ok-news-post-hour"}).find("span").get_text().strip()
+                news_item["published"] = self.__parse_publication_date(published_date)
                 news_item["description"] = top_paragraph
                 news_item["title"] = headline
                 news_item["url"] = headline_link
@@ -80,6 +89,8 @@ class OnlinekhabarScraper(NewsScraper):
                 featured_image = ((news_soup.find("div", {"class":"post-thumbnail"})).find("img").attrs["src"]).strip()
                 top_paragraph = (news_soup.find("div", {"class":"ok18-single-post-content-wrap"}).find("p").get_text()).strip()
                 headline = news_soup.find("h1").get_text().strip()
+                published_date = news_soup.find("div", {"class":"ok-news-post-hour"}).find("span").get_text().strip()
+                news_item["published"] = self.__parse_publication_date(published_date)
                 news_item["description"] = top_paragraph
                 news_item["title"] = headline
                 news_item["url"] = headline_link
@@ -105,6 +116,8 @@ class OnlinekhabarScraper(NewsScraper):
                 featured_image = ((news_soup.find("div", {"class":"post-thumbnail"})).find("img").attrs["src"]).strip()
                 top_paragraph = (news_soup.find("div", {"class":"ok18-single-post-content-wrap"}).find("p").get_text()).strip()
                 headline = news_soup.find("h1").get_text().strip()
+                published_date = news_soup.find("div", {"class":"ok-news-post-hour"}).find("span").get_text().strip()
+                news_item["published"] = self.__parse_publication_date(published_date)
                 news_item["description"] = top_paragraph
                 news_item["title"] = headline
                 news_item["url"] = headline_link
@@ -130,6 +143,8 @@ class OnlinekhabarScraper(NewsScraper):
                 headline = news_soup.find("h1").get_text().strip()
                 featured_image = ((news_soup.find("div", {"class":"post-thumbnail"})).find("img").attrs["src"]).strip()
                 top_paragraph = (news_soup.find("div", {"class":"ok18-single-post-content-wrap"}).find("p").get_text()).strip()
+                published_date = news_soup.find("div", {"class":"ok-news-post-hour"}).find("span").get_text().strip()
+                news_item["published"] = self.__parse_publication_date(published_date)
                 news_item["description"] = top_paragraph
                 news_item["title"] = headline
                 news_item["url"] = headline_link
@@ -155,13 +170,15 @@ class OnlinekhabarScraper(NewsScraper):
                 headline = news_soup.find("h1").get_text().strip()
                 featured_image = ((news_soup.find("div", {"class":"post-thumbnail"})).find("img").attrs["src"]).strip()
                 top_paragraph = (news_soup.find("div", {"class":"ok18-single-post-content-wrap"}).find("p").get_text()).strip()
+                published_date = news_soup.find("div", {"class":"article-posted-date"}).get_text().strip()
+                news_item["published"] = self.__parse_publication_date(published_date)
                 news_item["description"] = top_paragraph
                 news_item["title"] = headline
                 news_item["url"] = headline_link
                 news_item["image"] = featured_image
                 sport_links.append(news_item)
             except BaseException as e:
-                continue
+                print(e)
         return sport_links
 
 
@@ -183,6 +200,7 @@ class OnlinekhabarScraper(NewsScraper):
             "description": string
             "url": link
             "image": link
+            "published": int [unix time of publication]
         }
         """
         return {
