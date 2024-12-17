@@ -1,10 +1,12 @@
 from .base_scraper import NewsScraper
 import bs4
 import requests
+from .base_scraper import logger
 
 class OnlinekhabarScraper(NewsScraper):
     def __init__(self):
         super().__init__()
+        logger.info("Initialized ONLINEKHABAR scraper")
         self.news_data = self._NewsScraper__load_json_data()
         self.webpages_data = self._NewsScraper__scrape_websites(self.news_data["onlinekhabar"])
     

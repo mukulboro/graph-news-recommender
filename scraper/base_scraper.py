@@ -3,10 +3,11 @@ import bs4
 import json
 from nepali.date_converter import converter
 import datetime
-import time
+from .scraping_logger import logger
 
 class NewsScraper:
     def __init__(self, json_dir="scraper/news_data.json", date_map_dir = "scraper/date_map.json"):
+        logger.info("Initialized News Scraper")
         self.json_dir = json_dir
         self.date_map_dir = date_map_dir
 
@@ -44,14 +45,17 @@ class NewsScraper:
             "page2": <soup>
         }
         """
+        logger.info("Begin initial scraping all pages")
         page_data = dict()
         for i, key in enumerate(links):
+            logger.info(f"Page {i}: {links[key]}")
             page_key = key.split("_")[0]
             response = requests.get(links[key])
             response.encoding = "utf-8"
             response.raise_for_status()
             soup = bs4.BeautifulSoup(response.text, "html.parser")
             page_data[f"{page_key}"] = soup
+        logger.info("Scrapped all the links for the website")
         return page_data
 
 if __name__ == "__main__":
