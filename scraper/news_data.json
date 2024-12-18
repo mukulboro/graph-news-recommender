@@ -25,11 +25,11 @@
     "football_url": "https://www.ratopati.com/category/football"
   },
   "setopati": {
-    "homepage": "",
-    "national_url": "",
-    "intl_url": "",
-    "finance_url": "",
-    "entertainment_url": "",
-    "sports_url": ""
+    "homepage": "https://www.setopati.com/",
+    "national_url": "https://www.setopati.com/politics",
+    "intl_url": "https://www.setopati.com/global",
+    "finance_url": "https://www.setopati.com/kinmel",
+    "entertainment_url": "https://www.setopati.com/art",
+    "sports_url": "https://www.setopati.com/sports"
   }
 }

@@ -9,3 +9,4 @@ if __name__ == "__main__":
     ratoscraper=RatopatiScraper()
     rato_news=ratoscraper.get_all_news()
     print(rato_news)
+
