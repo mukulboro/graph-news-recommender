@@ -1,7 +1,12 @@
-from scraper.setopati_scraper import SetopatiScraper
+from scraper.onlinekhabar_scraper import OnlinekhabarScraper
+from scraper.ratopati_scraper import RatopatiScraper
 import pprint
 if __name__ == "__main__":
-    url = "https://www.bbc.com/news"
-    scraper = SetopatiScraper()
-    news = scraper.get_all_news()
+    # scraper = OnlinekhabarScraper()
+    # news = scraper.get_all_news()
     # pprint.pprint(news)
+
+    ratoscraper=RatopatiScraper()
+    rato_news=ratoscraper.get_all_news()
+    print(rato_news)
+
