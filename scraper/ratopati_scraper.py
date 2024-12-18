@@ -94,19 +94,19 @@ class RatopatiScraper(NewsScraper):
         return breaking_news_list
     
     def __get_business_news(self)->list:
-        return self.__get_category_news("finance",1)
+        return self.__get_category_news("finance",10)
     
     def __get_intl_news(self)->list:
-        return self.__get_category_news("intl")
+        return self.__get_category_news("intl",10)
     
     def __get_entertainment_news(self):
-        return self.__get_category_news("entertainment")
+        return self.__get_category_news("entertainment", 10)
     
     def __get_sports_news(self):
         sports_category=["sportsSpecial","npl","football","cricket"]
         sports_news_list=[]
         for category in sports_category:
-            sports_news_list.extend(self.__get_category_news(category,5))
+            sports_news_list.extend(self.__get_category_news(category,2))
         return sports_news_list
     
     def __get_national_news(self):
