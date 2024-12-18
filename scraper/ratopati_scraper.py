@@ -45,11 +45,11 @@ class RatopatiScraper(NewsScraper):
                     featured_image=featured_image_container.find("img").attrs["src"].strip()
                 else:
                     featured_image="https://cdn.pixabay.com/photo/2014/04/02/17/04/newspaper-307829_1280.png"
-                top_paragraph = (news_soup.find("div", {"class":"the-content"}).find("p").get_text()).strip()
+                top_paragraph = (news_soup.find("div", {"class":"the-content"}).find("p").get_text()).strip().replace("\xa0", " ")
                 published_date = news_soup.find("div", {"class":"post-hour"}).find("span").get_text().strip()
                 news_item["published"] = self.__parse_publication_date(published_date)
                 news_item["description"] = top_paragraph
-                news_item["title"] = headline
+                news_item["title"] = headline.replace("\xa0", " ")
                 news_item["url"] = headline_link
                 news_item["image"] = featured_image
                 category_news_list.append(news_item)
@@ -83,13 +83,12 @@ class RatopatiScraper(NewsScraper):
                 top_paragraph = (news_soup.find("div", {"class":"the-content"}).find("p").get_text()).strip()
                 published_date = news_soup.find("div", {"class":"post-hour"}).find("span").get_text().strip()
                 news_item["published"] = self.__parse_publication_date(published_date)
-                news_item["description"] = top_paragraph
-                news_item["title"] = headline
+                news_item["description"] = top_paragraph.replace("\xa0", " ")
+                news_item["title"] = headline.replace("\xa0", " ")
                 news_item["url"] = headline_link
                 news_item["image"] = featured_image
                 breaking_news_list.append(news_item)
             except BaseException as e:
-                print(item.find("a"))
                 print(e)
         return breaking_news_list
     
