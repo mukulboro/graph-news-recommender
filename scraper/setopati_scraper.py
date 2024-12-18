@@ -42,7 +42,7 @@ class SetopatiScraper(NewsScraper):
                 news_item["image"] = featured_image
                 breaking_news_list.append(news_item)
         except BaseException as e:
-            raise(e)
+            pass
         return breaking_news_list
     
     def __get_business_news(self):
