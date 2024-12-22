@@ -69,7 +69,7 @@ class SetopatiScraper(NewsScraper):
                 news_item["image"] = featured_image
                 news_list.append(news_item)
         except BaseException as e:
-            raise(e)
+            pass
         return news_list
     
     def __get_entertainment_news(self):
@@ -96,7 +96,7 @@ class SetopatiScraper(NewsScraper):
                 news_item["image"] = featured_image
                 news_list.append(news_item)
         except BaseException as e:
-            raise(e)
+            pass
         return news_list
     
     def __get_intl_news(self):
@@ -123,7 +123,7 @@ class SetopatiScraper(NewsScraper):
                 news_item["image"] = featured_image
                 news_list.append(news_item)
         except BaseException as e:
-            raise(e)
+            pass
         return news_list
     
     def __get_national_news(self):
@@ -150,7 +150,7 @@ class SetopatiScraper(NewsScraper):
                 news_item["image"] = featured_image
                 news_list.append(news_item)
         except BaseException as e:
-            raise(e)
+            pass
         return news_list
     
     def __get_sports_news(self):
@@ -177,7 +177,7 @@ class SetopatiScraper(NewsScraper):
                 news_item["image"] = featured_image
                 news_list.append(news_item)
         except BaseException as e:
-            raise(e)
+            pass
         return news_list
 
     def get_all_news(self):
