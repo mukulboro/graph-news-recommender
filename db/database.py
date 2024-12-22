@@ -1,6 +1,6 @@
 import sqlite3
 import hashlib
-import pprint
+from collections import defaultdict
 
 """
 id = Hash of the news title
@@ -22,21 +22,32 @@ class LocalDatabase:
         self.__create_table()
 
     def __create_table(self):
-        query = """
+        query_news_table = """
                 CREATE TABLE IF NOT EXISTS news(
                     id VARCHAR(256) PRIMARY KEY,
                     headline TEXT NOT NULL,
                     body TEXT NOT NULL,
-                    url TEXT NOT NULL,
+                    url TEXT NOT NULL UNIQUE,
                     image_url TEXT NOT NULL,
                     website TEXT NOT NULL,
                     category TEXT NOT NULL,
                     published INTEGER NOT NULL,
-                    processed INTEGER DEFAULT 0,
-                    in_graph INTEGER DEFAULT 0
+                    processed INTEGER DEFAULT 0
                 )
                 """
-        self.cursor.execute(query)
+        
+        query_cluster_table = """
+            CREATE TABLE IF NOT EXISTS clusters(
+                id VARCHAR(256),
+                news_id VARCHAR(256),
+                in_graph INTEGER DEFAULT 0,
+                PRIMARY KEY (id, news_id),
+                FOREIGN KEY (news_id) REFERENCES news(id)
+            )
+        """
+        self.cursor.execute(query_news_table)
+        self.cursor.execute(query_cluster_table)
+        
 
     def insert_news(self, website:str, news_dict:dict):
         categories = news_dict.keys()
@@ -63,3 +74,84 @@ class LocalDatabase:
                 except sqlite3.IntegrityError as e:
                     continue
         print(f"{new_news} new news added from {website}")
+        
+    def get_unprocessed_news(self):
+        all_data = list()
+        query = """
+            SELECT * FROM NEWS WHERE processed = 0 ORDER BY published DESC
+        """
+        self.cursor.execute(query)
+        data = self.cursor.fetchall()
+        for d in data:
+            all_data.append({
+                "key": d[0],
+                "news": f"{d[1]} {d[2]}",
+                "category": f"{d[-4]}"
+            })
+        return all_data
+    
+    def update_processed_news(self, news_list:list):
+        # News list is a list of pk for all news
+        query = """
+        UPDATE news
+        SET processed = 1
+        WHERE id = ?
+        """
+        self.cursor.executemany(query, [(news,) for news in news_list])
+        self.connection.commit()
+    
+    def add_news_cluster(self, cluster:dict):
+        cluster_id = cluster["keys"][0]
+        for key in cluster["keys"]:
+            query = """
+                INSERT INTO clusters (id, news_id)
+                VALUES (?, ?)
+            """
+            self.cursor.execute(query, (cluster_id, key))
+            self.connection.commit()
+            
+    def get_clustered_news(self):
+        all_data = list()
+        query = """
+            SELECT * FROM
+            clusters JOIN news 
+            ON clusters.news_id = news.id
+            WHERE clusters.in_graph = 0 
+        """
+        self.cursor.execute(query)
+        data = self.cursor.fetchall()
+        # Parse data in desired format
+        for d in data:
+            all_data.append({
+                "cluster_id": d[0],
+                "news_id": f"{d[1]}",
+                "headline": f"{d[4]}",
+                "body": f"{d[5]}",
+                "url": f"{d[6]}",
+                "image_url": f"{d[7]}",
+                "website": f"{d[8]}",
+                "category": f"{d[9]}",
+                "published": f"{d[10]}",
+            })
+        
+        clusters = {}
+        for item in all_data:
+            cluster_id = item['cluster_id']
+            if cluster_id not in clusters:
+                clusters[cluster_id] = {
+                    "cluster": cluster_id,
+                    "category": item['category'], 
+                    "published": item['published'], 
+                    "news": []
+                }
+            # Append the news article details
+            clusters[cluster_id]['news'].append({
+                "headline": item["headline"],
+                "body": item["body"],
+                "website": item["website"],
+                "url": item["url"],
+                "image_url": item["image_url"]
+            })
+
+        transformed_data = list(clusters.values())
+        return transformed_data
