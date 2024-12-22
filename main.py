@@ -3,7 +3,7 @@ from scraper.onlinekhabar_scraper import OnlinekhabarScraper
 from scraper.ratopati_scraper import RatopatiScraper
 from scraper.setopati_scraper import SetopatiScraper
 import time
-from Threading.threading import ThreadScraping
+from news_threading.threading import ThreadScraping
 
 if __name__ == "__main__":
     ld = LocalDatabase()
@@ -14,8 +14,8 @@ if __name__ == "__main__":
     # rs.get_all_news()
     ss = SetopatiScraper()
     # ss.get_all_news()
-    tr=ThreadScraping()
-    news_data=tr.run(onlinekhabar=os,ratopati=rs,setopati=ss)
+    ts=ThreadScraping()
+    news_data=ts.run(onlinekhabar=os,ratopati=rs,setopati=ss)
     end=time.time()
     print(f"Completed all scraping in {end-start} seconds")
         
