@@ -40,6 +40,7 @@ class LocalDatabase:
 
     def insert_news(self, website:str, news_dict:dict):
         categories = news_dict.keys()
+        new_news = 0
         for category in categories:
             news_list = news_dict[category]
             for news in news_list:
@@ -58,5 +59,7 @@ class LocalDatabase:
                                     (id, headline, body, url, image_url, website, category, published))
                 
                     self.connection.commit()
+                    new_news += 1
                 except sqlite3.IntegrityError as e:
                     continue
+        print(f"{new_news} new news added from {website}")
