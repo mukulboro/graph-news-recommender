@@ -9,15 +9,11 @@ import json
 
 if __name__ == "__main__":
     ld = LocalDatabase()
-    start = time.time()
     os = OnlinekhabarScraper()
-    os_data = os.get_all_news()
-
     rs = RatopatiScraper()
-    rs_data = rs.get_all_news()
-
     ss = SetopatiScraper()
-    ss_data = ss.get_all_news()
+    
+    start = time.time()
     ts=ThreadScraping()
     news_data=ts.run(onlinekhabar=os,ratopati=rs,setopati=ss)
     end=time.time()
