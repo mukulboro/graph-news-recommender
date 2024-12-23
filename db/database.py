@@ -33,7 +33,8 @@ class LocalDatabase:
                     website TEXT NOT NULL,
                     category TEXT NOT NULL,
                     published INTEGER NOT NULL,
-                    processed INTEGER DEFAULT 0
+                    processed INTEGER DEFAULT 0,
+                    scraped_at DATETIME DEFAULT CURRENT_TIMESTAMP
                 )
                 """
         
@@ -128,7 +129,7 @@ class LocalDatabase:
             clusters JOIN news 
             ON clusters.news_id = news.id
             WHERE clusters.in_graph = 0
-            ORDER BY news.published DESC
+            ORDER BY news.scraped_at DESC
         """
         with sqlite3.connect(self.db_location) as connection:
             cursor = connection.cursor()
