@@ -5,19 +5,34 @@ import matplotlib.pyplot as plt
 from sklearn.metrics.pairwise import cosine_similarity
 from db.database import LocalDatabase
 from collections import defaultdict
+from nepali_stemmer.stemmer import NepStemmer
+
 
 class ClusterNews:
-    def __init__(self):
+    def __init__(self, stopwords_dir="clustering/stopwords.txt"):
         self.news = list()
         self.database = LocalDatabase()
+        self.stopwords_dir = stopwords_dir
         self.all_news = self.database.get_unprocessed_news()
         for news in self.all_news:
-            self.news.append(news["news"])
+            stemmed_news = self.__stem_news(news=news["news"])
+            self.news.append(stemmed_news)
+    
+    def __stem_news(self, news):
+        nepstem = NepStemmer()
+        with open(self.stopwords_dir, 'r') as f:
+            stopwords = f.readlines()
+        stemmed_news = nepstem.stem(news)
+        news_words = stemmed_news.split(" ")
+        filtered_sentence = [word for word in news_words if word.strip() not in stopwords]
+        result = " ".join(filtered_sentence)
+        return result
 
     def __vectorize_news(self):
-        tfidf = TfidfVectorizer()
-        tfidf_matrix = tfidf.fit_transform(self.news)
-        return tfidf_matrix
+        if len(self.news) > 0:
+            tfidf = TfidfVectorizer()
+            tfidf_matrix = tfidf.fit_transform(self.news)
+            return tfidf_matrix
 
     def __get_difference_matrix(self):
         tfidf_matrix = self.__vectorize_news()
@@ -26,7 +41,7 @@ class ClusterNews:
         return distance_matrix
     
     def __cluster_news(self):
-        if len(self.news) > 0:
+        if len(self.news) > 1: # AG Clustering requires at least 2 items
             distance_matrix = self.__get_difference_matrix()
             clustering = AgglomerativeClustering(
             metric='precomputed',  
@@ -37,23 +52,29 @@ class ClusterNews:
             clustering.fit(distance_matrix)
             news_clusters = clustering.labels_
             return news_clusters
+        else:
+            return []
         
     def __plot_custers(self):
-        distance_matrix = self.__get_difference_matrix()
-        linked = linkage(distance_matrix, 'average')
-        # Plot dendrogram
-        plt.figure(figsize=(8, 6))
-        dendrogram(
-            linked,
-            orientation='top',
-            # labels=dendrogram_labels,
-            distance_sort='descending',
-            show_leaf_counts=True
-        )
-        plt.title("Hierarchical Clustering Dendrogram")
-        plt.xlabel("News Headlines/Paragraphs")
-        plt.ylabel("Distance")
-        plt.savefig("Test.png")
+        try:
+            distance_matrix = self.__get_difference_matrix()
+            linked = linkage(distance_matrix, 'average')
+            # Plot dendrogram
+            plt.figure(figsize=(8, 6))
+            dendrogram(
+                linked,
+                orientation='top',
+                color_threshold= 0.5,
+                # labels=dendrogram_labels,
+                distance_sort='descending',
+                show_leaf_counts=True
+            )
+            plt.title("Hierarchical Clustering Dendrogram")
+            plt.xlabel("News Headlines/Paragraphs")
+            plt.ylabel("Distance")
+            plt.savefig("Test.png")
+        except BaseException as e:
+            print("Euta ni news na vayera plot garina hehehe")
         
     def __assign_clusters(self):
         all_clusters = list()

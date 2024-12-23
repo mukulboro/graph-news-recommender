@@ -17,8 +17,9 @@ in_graph = bool
 
 class LocalDatabase:
     def __init__(self, db_location="sqlite.db"):
-        self.connection = sqlite3.connect(db_location)
-        self.cursor = self.connection.cursor()
+        self.db_location = db_location
+        # self.connection = sqlite3.connect(db_location)
+        # self.cursor = self.connection.cursor()
         self.__create_table()
 
     def __create_table(self):
@@ -45,8 +46,10 @@ class LocalDatabase:
                 FOREIGN KEY (news_id) REFERENCES news(id)
             )
         """
-        self.cursor.execute(query_news_table)
-        self.cursor.execute(query_cluster_table)
+        with sqlite3.connect(self.db_location) as connection:
+            cursor = connection.cursor()
+            cursor.execute(query_news_table)
+            cursor.execute(query_cluster_table)
         
 
     def insert_news(self, website:str, news_dict:dict):
@@ -66,10 +69,12 @@ class LocalDatabase:
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """
                 try:
-                    self.cursor.execute(query,
+                    with sqlite3.connect(self.db_location) as connection:
+                        cursor = connection.cursor()
+                        cursor.execute(query,
                                     (id, headline, body, url, image_url, website, category, published))
                 
-                    self.connection.commit()
+                        connection.commit()
                     new_news += 1
                 except sqlite3.IntegrityError as e:
                     continue
@@ -80,8 +85,10 @@ class LocalDatabase:
         query = """
             SELECT * FROM NEWS WHERE processed = 0 ORDER BY published DESC
         """
-        self.cursor.execute(query)
-        data = self.cursor.fetchall()
+        with sqlite3.connect(self.db_location) as connection:
+            cursor = connection.cursor()
+            cursor.execute(query)
+            data = cursor.fetchall()
         for d in data:
             all_data.append({
                 "key": d[0],
@@ -97,8 +104,10 @@ class LocalDatabase:
         SET processed = 1
         WHERE id = ?
         """
-        self.cursor.executemany(query, [(news,) for news in news_list])
-        self.connection.commit()
+        with sqlite3.connect(self.db_location) as connection:
+            cursor = connection.cursor()
+            cursor.executemany(query, [(news,) for news in news_list])
+            connection.commit()
     
     def add_news_cluster(self, cluster:dict):
         cluster_id = cluster["keys"][0]
@@ -107,8 +116,10 @@ class LocalDatabase:
                 INSERT INTO clusters (id, news_id)
                 VALUES (?, ?)
             """
-            self.cursor.execute(query, (cluster_id, key))
-            self.connection.commit()
+            with sqlite3.connect(self.db_location) as connection:
+                cursor = connection.cursor()
+                cursor.execute(query, (cluster_id, key))
+                connection.commit()
             
     def get_clustered_news(self):
         all_data = list()
@@ -116,10 +127,13 @@ class LocalDatabase:
             SELECT * FROM
             clusters JOIN news 
             ON clusters.news_id = news.id
-            WHERE clusters.in_graph = 0 
+            WHERE clusters.in_graph = 0
+            ORDER BY news.published DESC
         """
-        self.cursor.execute(query)
-        data = self.cursor.fetchall()
+        with sqlite3.connect(self.db_location) as connection:
+            cursor = connection.cursor()
+            cursor.execute(query)
+            data = cursor.fetchall()
         # Parse data in desired format
         for d in data:
             all_data.append({

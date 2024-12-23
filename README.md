@@ -1,0 +1,1 @@
+- Nepali Stopwords courtesy: [prtx/Nepali-Stopwords](https://github.com/prtx/Nepali-Stopwords/blob/master/nepali_stopwords.txt)
