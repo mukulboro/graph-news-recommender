@@ -47,7 +47,7 @@ class ClusterNews:
             metric='precomputed',  
             linkage='average',  
             n_clusters=None,  
-            distance_threshold=0.3  # Decided based on experimentation
+            distance_threshold=0.6  # Decided based on experimentation
             )
             clustering.fit(distance_matrix)
             news_clusters = clustering.labels_
@@ -106,7 +106,7 @@ class ClusterNews:
             # Update the processed value of all clustered news
             self.database.update_processed_news(news_list=r["keys"])
         
-        self.__plot_custers()
+        # self.__plot_custers()
         return result
             
 

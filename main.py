@@ -8,18 +8,19 @@ from news_threading.threading import ThreadScraping
 import json
 
 if __name__ == "__main__":
-    ld = LocalDatabase()
-    os = OnlinekhabarScraper()
-    rs = RatopatiScraper()
-    ss = SetopatiScraper()
     
     while True:
-        start = time.time()
+        os = OnlinekhabarScraper()
+        rs = RatopatiScraper()
+        ss = SetopatiScraper()
         ts=ThreadScraping()
+        ld = LocalDatabase()
+        
+        start = time.time()
         news_data=ts.run(onlinekhabar=os,ratopati=rs,setopati=ss)
         end=time.time()
 
-        print(f"Completed all scraping in {end-start} seconds")
+        print(f"Completed all scraping in {end-start} seconds\n\n")
 
         ld.insert_news(website="onlinekhabar", news_dict=news_data['onlinekhabar'])
         ld.insert_news(website="ratopati", news_dict=news_data['ratopati'])
@@ -27,11 +28,12 @@ if __name__ == "__main__":
        
         cluster = ClusterNews()
         all_clusters = cluster.parse_clusters()
-        clustered = ld.get_clustered_news()
+        # clustered = ld.get_clustered_news()
+        # print(len(clustered))
         
-        with open("clusters.json", "w") as f:
-            f.write(json.dumps(clustered, ensure_ascii=False))
+        # with open("clusters.json", "w") as f:
+        #     f.write(json.dumps(clustered, ensure_ascii=False))
             
         # Sleep for 20 mins till next scraping
-        break
+        time.sleep(20*60)
     

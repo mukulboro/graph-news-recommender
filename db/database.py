@@ -1,6 +1,7 @@
 import sqlite3
 import hashlib
 from collections import defaultdict
+import datetime as dt
 
 """
 id = Hash of the news title
@@ -83,12 +84,17 @@ class LocalDatabase:
         
     def get_unprocessed_news(self):
         all_data = list()
+        today = dt.datetime.now()
+        y, m, d = today.year, today.month, today.day
+        today_utc = int(dt.datetime(y, m, d).timestamp())
         query = """
-            SELECT * FROM NEWS WHERE processed = 0 ORDER BY published DESC
+            SELECT * FROM NEWS WHERE processed = ? 
+            OR published = ?
+            ORDER BY published DESC
         """
         with sqlite3.connect(self.db_location) as connection:
             cursor = connection.cursor()
-            cursor.execute(query)
+            cursor.execute(query, (0, today_utc))
             data = cursor.fetchall()
         for d in data:
             all_data.append({
@@ -113,16 +119,31 @@ class LocalDatabase:
     def add_news_cluster(self, cluster:dict):
         cluster_id = cluster["keys"][0]
         for key in cluster["keys"]:
-            query = """
-                INSERT INTO clusters (id, news_id)
-                VALUES (?, ?)
+            query_check_if_exists = """
+                SELECT * FROM clusters 
+                WHERE news_id = ?
             """
             with sqlite3.connect(self.db_location) as connection:
                 cursor = connection.cursor()
-                cursor.execute(query, (cluster_id, key))
+                cursor.execute(query_check_if_exists, (key,))
+                check = cursor.fetchone()
+                if check == None:
+                    query = """
+                            INSERT INTO clusters (id, news_id)
+                            VALUES (?, ?)
+                        """
+                    cursor.execute(query, (cluster_id, key))
+                else:
+                    query = """
+                        UPDATE clusters 
+                        SET id = ?
+                        WHERE news_id = ?
+                    """
+                    cursor.execute(query, (cluster_id, key)) 
                 connection.commit()
             
     def get_clustered_news(self):
+        # All news that have been clustered but not yet put in graph
         all_data = list()
         query = """
             SELECT * FROM
@@ -147,6 +168,7 @@ class LocalDatabase:
                 "website": f"{d[8]}",
                 "category": f"{d[9]}",
                 "published": f"{d[10]}",
+                "scraped": f"{d[-1]}"
             })
         
         clusters = {}
@@ -156,7 +178,8 @@ class LocalDatabase:
                 clusters[cluster_id] = {
                     "cluster": cluster_id,
                     "category": item['category'], 
-                    "published": item['published'], 
+                    "published": item['published'],
+                    "scraped": item["scraped"], 
                     "news": []
                 }
             # Append the news article details
@@ -170,3 +193,10 @@ class LocalDatabase:
 
         transformed_data = list(clusters.values())
         return transformed_data
+    
+    def get_single_cluster(self, cluster_key):
+        query = """
+        
+        """
+        with sqlite3.connect(self.db_location) as connection:
+            cursor = connection.cursor()

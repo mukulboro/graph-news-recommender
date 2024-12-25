@@ -52,7 +52,7 @@ class NewsScraper:
             page_key = key.split("_")[0]
             response = requests.get(links[key])
             response.encoding = "utf-8"
-            response.raise_for_status()
+            # response.raise_for_status()
             soup = bs4.BeautifulSoup(response.text, "html.parser")
             page_data[f"{page_key}"] = soup
         logger.info("Scrapped all the links for the website")
