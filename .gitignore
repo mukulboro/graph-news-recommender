@@ -4,3 +4,5 @@ logs/*
 *.db
 backups/
 tempCodeRunnerFile.py
+clusters.json
+news_verify.py

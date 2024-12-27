@@ -194,9 +194,13 @@ class LocalDatabase:
         transformed_data = list(clusters.values())
         return transformed_data
     
-    def get_single_cluster(self, cluster_key):
+    def update_cluster_in_graph(self, cluster_key:str):
         query = """
-        
+        UPDATE clusters
+        SET in_graph = 1
+        WHERE id = ?
         """
         with sqlite3.connect(self.db_location) as connection:
             cursor = connection.cursor()
+            cursor.execute(query, (cluster_key,))
+            connection.commit()
