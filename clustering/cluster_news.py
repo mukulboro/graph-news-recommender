@@ -47,7 +47,7 @@ class ClusterNews:
             metric='precomputed',  
             linkage='average',  
             n_clusters=None,  
-            distance_threshold=0.3  # Decided based on experimentation
+            distance_threshold=0.4  # Decided based on experimentation
             )
             clustering.fit(distance_matrix)
             news_clusters = clustering.labels_
@@ -89,7 +89,8 @@ class ClusterNews:
                 })
         return all_clusters
     
-    def parse_clusters(self):
+    def parse_clusters(self)->None:
+        # Parse clusters and store everything in the database
         all_clusters = self.__assign_clusters()
         clustered_data = defaultdict(lambda: {"news": [], "keys": []})
         for item in all_clusters:
@@ -106,8 +107,7 @@ class ClusterNews:
             # Update the processed value of all clustered news
             self.database.update_processed_news(news_list=r["keys"])
         
-        self.__plot_custers()
-        return result
+        # self.__plot_custers()
             
 
 
