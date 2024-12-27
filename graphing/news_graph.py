@@ -7,13 +7,14 @@ import os
 import datetime as dt
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
+from nepali_stemmer.stemmer import NepStemmer
+
 
 class ClusterNode:
     # Special class to store all data about the cluster in node
     def __init__(self, cluster:dict):
         self.key = cluster["cluster"]
+        self.id = self.__get_id()
         self.category = cluster["category"]
         self.published = int(cluster["published"])
         self.headline = cluster["news"][0]["headline"]
@@ -28,21 +29,31 @@ class ClusterNode:
                                   hour=int(h), minute=int(mi), second=int(s))
         return int(parsed_date.timestamp())
     
+    def __get_id(self):
+        return int(self.key, 16)
+    
     def __repr__(self):
         return self.key
+    
+    def __hash__(self):
+        return self.id
 
 class NewsGraph:
     def __init__(self, 
                  scrape_frequency = 20*60, 
-                 edge_threshold = 0.3,
-                 backup_location="backups/graphs/"):
+                 edge_threshold = 3.5,
+                 backup_location="backups/graphs/",
+                 stopwords_dir = "clustering/stopwords.txt"):
         self.scrape_fq = scrape_frequency # in seconds
         self.edge_thrs = edge_threshold
         self.backup_dir = backup_location
-    
+        self.cosine_sim_memoize = {}
         self.__load_graph()
         self.current_backup = int(time.time()) # File to use to hold backup of current instance
-        
+        with open(stopwords_dir, 'r') as f:
+            self.stopwords = f.readlines()
+        self.nepstem = NepStemmer()
+          
         self.db = LocalDatabase()
         self.all_clusters = self.db.get_clustered_news()
         
@@ -66,15 +77,32 @@ class NewsGraph:
         # ⌊ |cos(Δday)| ⌋
         return math.floor( abs( math.cos(delta) ) )
     
+    def __stem_sentences(self, news):
+        try:
+            return self.cosine_sim_memoize[f"{news}"]
+        except KeyError:
+            stemmed = self.nepstem.stem(news)
+            news_words = stemmed.split(" ")
+            filtered_sentence = [word for word in news_words if word.strip() not in self.stopwords]
+            result = " ".join(filtered_sentence)
+            self.cosine_sim_memoize[f"{news}"] = result
+            return result
+        
     def __get_cosine_similarity_score(self, news1, news2):
+        # First stem the sentences
+              
         news_list = [news1, news2]
+        stemmed_news_list = []
+        for news in news_list:
+            stemmed_news = self.__stem_sentences(news)
+            stemmed_news_list.append(stemmed_news)
         tfidf = TfidfVectorizer()
-        tfidf_matrix = tfidf.fit_transform(news_list)
+        tfidf_matrix = tfidf.fit_transform(stemmed_news_list)
         cosine_sim = cosine_similarity(tfidf_matrix)
         return cosine_sim[0, 1]
 
     def __get_category_score(self, category1, category2):
-        if category1 == category1:
+        if category1 == category2:
             return 1
         return 0
     
@@ -93,15 +121,15 @@ class NewsGraph:
                                                    category2=news2.category)
         scraping_time_score = self.__get_scrape_time_score(scrape1=news1.scraped,
                                                            scrape2=news2.scraped)
-        # Edge Score = (2PubScore + 3CosSim + 2CatScore + ScrapeScore)/7
+        # Edge Score = (2PubScore + 3CosSim + 2CatScore + ScrapeScore)
         
-        edge_score = (2*publication_day_score + 3*cosine_sim_score +
-                      2*category_score + scraping_time_score) / 7
+        edge_score = (2*publication_day_score + 5*cosine_sim_score +
+                      2*category_score + scraping_time_score) 
         if edge_score > self.edge_thrs:
             # Return complement of edge score
             # so shortest path algorith finds the
             # news with the most similarity
-            return round(1-edge_score, 4)
+            return round(10-edge_score)
         else:
             return None
     
@@ -131,11 +159,40 @@ class NewsGraph:
             edge_list = []
             for graph_node in node_list:
                 edge_weight = self.__get_edge_weight(cluster_node, graph_node)
-                if not edge_weight == None:
+                if not edge_weight == None and edge_weight > 0: 
                     edge_list.append( (cluster_node, graph_node, edge_weight) )
-            self.graph.add_node(cluster_node, color=self.__get_node_color(cluster_node.category))
+            self.graph.add_node(cluster_node, 
+                                id = cluster_node.key,
+                                color=self.__get_node_color(cluster_node.category))
             self.graph.add_weighted_edges_from(edge_list)
             print(f"Added Node {cluster_node} with {len(edge_list)} edges")
             self.__save_graph()
             self.db.update_cluster_in_graph(cluster_key=cluster_node.key)
+            
+        isolated_nodes = list(nx.isolates(self.graph))
+        print("Isolated nodes:", isolated_nodes)
+    
+    def get_shortest_path(self, source, destinaton):
+        
+        self.__load_graph()
+        node_list = list(self.graph.nodes(data=True))
+        
+        source_node = None
+        target_node = None
+        for node in node_list:
+            if source_node == None or target_node == None:
+                if node[1]["id"] == source:
+                    source_node = node[0]
+                if node[1]["id"] == destinaton:
+                    target_node = node[0]
+            if not source_node == None and not target_node == None:
+                break
+        
+        paths = nx.all_shortest_paths(G=self.graph,
+                                            source=source_node,
+                                            target=target_node,
+                                            weight="weight")
+        sorted_paths = sorted( list(paths), key= lambda x : len(x) )
+        longest_path = sorted_paths[0]
+        return longest_path
     

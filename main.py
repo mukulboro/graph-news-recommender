@@ -13,8 +13,13 @@ def scrape_and_process_news():
     ld = LocalDatabase()
     ts=ThreadScraping()
     os = OnlinekhabarScraper()
+    print("Initialized ONLINEKHABAR")
     rs = RatopatiScraper()
+    print("Initialized RATOPATI")
     ss = SetopatiScraper()
+    print("Initialized SETOPATI")
+
+    print("Initialized all objects")
     # Simultaneously Scrape all data from all websites
     news_data=ts.run(onlinekhabar=os,ratopati=rs,setopati=ss)
     # Insert data into database. Also cleans duplicate news
@@ -37,10 +42,13 @@ if __name__ == "__main__":
     itr = 1
     while True:
         time_taken = scrape_and_process_news()
-        print(f"Completed Iteration{itr} in {time_taken} seconds\n\n")
+        print(f"Completed Iteration [{itr}] in {time_taken} seconds\n\n")
         itr += 1
         # Scrape every 20 mins keeping in mind the time taken
-        # time.sleep(20*60 - time_taken)
-        break
+        time.sleep(20*60 - time_taken)
+        # ng = NewsGraph()
+        # ng.get_shortest_path(source="c701d1c4d1e3e50dd2bef9c268837d71339937b341b2a01106d0120dace2430e",
+        #                      destinaton="5126284ed8cb13d254ab49bb991e15c7ac4153ee520f5e92ef40f1a9958b7920")
+        # break 
      
-    
+
