@@ -44,6 +44,7 @@ class LocalDatabase:
                 id VARCHAR(256),
                 news_id VARCHAR(256),
                 in_graph INTEGER DEFAULT 0,
+                in_firebase INTEGER DEFAULT 0,
                 PRIMARY KEY (id, news_id),
                 FOREIGN KEY (news_id) REFERENCES news(id)
             )
@@ -161,13 +162,13 @@ class LocalDatabase:
             all_data.append({
                 "cluster_id": d[0],
                 "news_id": f"{d[1]}",
-                "headline": f"{d[4]}",
-                "body": f"{d[5]}",
-                "url": f"{d[6]}",
-                "image_url": f"{d[7]}",
-                "website": f"{d[8]}",
-                "category": f"{d[9]}",
-                "published": f"{d[10]}",
+                "headline": f"{d[5]}",
+                "body": f"{d[6]}",
+                "url": f"{d[7]}",
+                "image_url": f"{d[8]}",
+                "website": f"{d[9]}",
+                "category": f"{d[10]}",
+                "published": f"{d[11]}",
                 "scraped": f"{d[-1]}"
             })
         
@@ -203,4 +204,66 @@ class LocalDatabase:
         with sqlite3.connect(self.db_location) as connection:
             cursor = connection.cursor()
             cursor.execute(query, (cluster_key,))
+            connection.commit()
+            
+    def get_all_offline_news(self):
+        all_data = list()
+        query = """
+            SELECT * FROM
+            clusters JOIN news 
+            ON clusters.news_id = news.id
+            WHERE clusters.in_firebase = 0
+            ORDER BY news.scraped_at DESC
+        """
+        with sqlite3.connect(self.db_location) as connection:
+            cursor = connection.cursor()
+            cursor.execute(query)
+            data = cursor.fetchall()
+        # Parse data in desired format
+        for d in data:
+            all_data.append({
+                "cluster_id": d[0],
+                "news_id": f"{d[1]}",
+                "headline": f"{d[5]}",
+                "body": f"{d[6]}",
+                "url": f"{d[7]}",
+                "image_url": f"{d[8]}",
+                "website": f"{d[9]}",
+                "category": f"{d[10]}",
+                "published": f"{d[11]}",
+                "scraped": f"{d[-1]}"
+            })
+        
+        clusters = {}
+        for item in all_data:
+            cluster_id = item['cluster_id']
+            if cluster_id not in clusters:
+                clusters[cluster_id] = {
+                    "cluster": cluster_id,
+                    "category": item['category'], 
+                    "published": item['published'],
+                    "scraped": item["scraped"], 
+                    "news": []
+                }
+            # Append the news article details
+            clusters[cluster_id]['news'].append({
+                "headline": item["headline"],
+                "body": item["body"],
+                "website": item["website"],
+                "url": item["url"],
+                "image_url": item["image_url"]
+            })
+
+        transformed_data = list(clusters.values())
+        return transformed_data
+    
+    def update_news_in_firebase(self, key:str):
+        query = """
+        UPDATE clusters
+        SET in_firebase = 1
+        WHERE id = ?
+        """
+        with sqlite3.connect(self.db_location) as connection:
+            cursor = connection.cursor()
+            cursor.execute(query, (key,))
             connection.commit()

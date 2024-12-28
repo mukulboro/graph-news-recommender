@@ -159,6 +159,7 @@ class NewsGraph:
             edge_list = []
             for graph_node in node_list:
                 edge_weight = self.__get_edge_weight(cluster_node, graph_node)
+                if edge_weight == 0: edge_weight = 0.5
                 if not edge_weight == None and edge_weight > 0: 
                     edge_list.append( (cluster_node, graph_node, edge_weight) )
             self.graph.add_node(cluster_node, 

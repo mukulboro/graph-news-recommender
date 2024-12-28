@@ -6,12 +6,14 @@ import time
 from clustering.cluster_news import ClusterNews
 from news_threading.threading import ThreadScraping
 from graphing.news_graph import NewsGraph
+from firebase.fb import FirebaseNews
 
 def scrape_and_process_news():
     start = time.time()
     # Initialize all objects needed
     ld = LocalDatabase()
     ts=ThreadScraping()
+    fb = FirebaseNews()
     os = OnlinekhabarScraper()
     print("Initialized ONLINEKHABAR")
     rs = RatopatiScraper()
@@ -34,8 +36,8 @@ def scrape_and_process_news():
     ng = NewsGraph()
     # Insert data in graph
     ng.build_graph()
+    fb.upload_all_news()
     end = time.time()
-    
     return round(end-start, 2)
 
 if __name__ == "__main__":
@@ -46,9 +48,5 @@ if __name__ == "__main__":
         itr += 1
         # Scrape every 20 mins keeping in mind the time taken
         time.sleep(20*60 - time_taken)
-        # ng = NewsGraph()
-        # ng.get_shortest_path(source="c701d1c4d1e3e50dd2bef9c268837d71339937b341b2a01106d0120dace2430e",
-        #                      destinaton="5126284ed8cb13d254ab49bb991e15c7ac4153ee520f5e92ef40f1a9958b7920")
-        # break 
-     
+        
 
