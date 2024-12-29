@@ -267,3 +267,42 @@ class LocalDatabase:
             cursor = connection.cursor()
             cursor.execute(query, (key,))
             connection.commit()
+            
+    def get_latest_news_by_category(self):
+        query = """
+            SELECT 
+            n.category,
+            c.id, 
+            MAX(n.scraped_at) AS latest_published 
+        FROM 
+            news n JOIN clusters c ON n.id = c.news_id
+        GROUP BY 
+            n.category
+        """
+        data_dict = dict()
+        with sqlite3.connect(self.db_location) as connection:
+            cursor = connection.cursor()
+            cursor.execute(query)
+            data = cursor.fetchall()
+            for d in data:
+                data_dict[f"{d[0]}"] = d[1]
+        return data_dict
+    
+    def get_latest_news(self):
+        query = """
+            SELECT 
+            c.id
+        FROM 
+            news n JOIN clusters c ON n.id = c.news_id
+        ORDER BY 
+            n.scraped_at DESC
+        LIMIT 100
+        """
+        news_list = []
+        with sqlite3.connect(self.db_location) as connection:
+            cursor = connection.cursor()
+            cursor.execute(query)
+            data = cursor.fetchall()
+            for d in data:
+                news_list.append(d[0])
+        return news_list
