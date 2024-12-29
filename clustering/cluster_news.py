@@ -106,7 +106,6 @@ class ClusterNews:
             self.database.add_news_cluster(r)
             # Update the processed value of all clustered news
             self.database.update_processed_news(news_list=r["keys"])
-        
         # self.__plot_custers()
             
 

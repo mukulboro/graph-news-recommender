@@ -188,12 +188,14 @@ class NewsGraph:
                     target_node = node[0]
             if not source_node == None and not target_node == None:
                 break
-        
-        paths = nx.all_shortest_paths(G=self.graph,
-                                            source=source_node,
-                                            target=target_node,
-                                            weight="weight")
-        sorted_paths = sorted( list(paths), key= lambda x : len(x) )
-        longest_path = sorted_paths[0]
-        return longest_path
+        try:
+            paths = nx.all_shortest_paths(G=self.graph,
+                                                source=source_node,
+                                                target=target_node,
+                                                weight="weight")
+            sorted_paths = sorted( list(paths), key= lambda x : len(x) )
+            longest_path = sorted_paths[0]
+            return longest_path
+        except nx.NetworkXNoPath:
+            return []
     
