@@ -27,6 +27,7 @@ class Recommender:
             for pref_news in self.prefs[key]["news_list"]:
                 news_path = self.graph.get_shortest_path(source=pref_news,
                                                          destinaton=latest_news)
+                news_path = [x for x in news_path if not x.key == pref_news]
                 all_news.extend(news_path)
         all_news = sorted(all_news,key= lambda x : -x.scraped)
         all_news = [x.key for x in all_news]
