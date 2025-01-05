@@ -208,16 +208,20 @@ class LocalDatabase:
             
     def get_all_offline_news(self):
         all_data = list()
+        today = dt.datetime.now()
+        y, m, d = today.year, today.month, today.day
+        today_utc = int(dt.datetime(y, m, d).timestamp())
         query = """
             SELECT * FROM
             clusters JOIN news 
             ON clusters.news_id = news.id
             WHERE clusters.in_firebase = 0
+            or news.published = ?
             ORDER BY news.scraped_at DESC
         """
         with sqlite3.connect(self.db_location) as connection:
             cursor = connection.cursor()
-            cursor.execute(query)
+            cursor.execute(query, (today_utc, ))
             data = cursor.fetchall()
         # Parse data in desired format
         for d in data:

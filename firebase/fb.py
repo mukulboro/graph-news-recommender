@@ -24,10 +24,19 @@ class FirebaseNews:
         collection_ref = self.db.collection("news")
         for cluster in unuploaded_clusters:
             doc_ref = collection_ref.document(cluster["cluster"])
-            doc_ref.set({
-                "category": cluster["category"],
-                "published": int(cluster["published"]),
-                "news": cluster["news"],
-                "scraped": self.__parse_scraped(cluster["scraped"])
-            })
+            existing_document = doc_ref.get()
+            if existing_document.exists:
+                doc_ref.update({
+                    "category": cluster["category"],
+                    "published": int(cluster["published"]),
+                    "news": cluster["news"],
+                    "scraped": self.__parse_scraped(cluster["scraped"])
+                })
+            else:
+                doc_ref.set({
+                    "category": cluster["category"],
+                    "published": int(cluster["published"]),
+                    "news": cluster["news"],
+                    "scraped": self.__parse_scraped(cluster["scraped"])
+                })
             self.local_db.update_news_in_firebase(key=cluster["cluster"])
