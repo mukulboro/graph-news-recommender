@@ -193,7 +193,7 @@ class NewsGraph:
                                                 source=source_node,
                                                 target=target_node,
                                                 weight="weight")
-            sorted_paths = sorted( list(paths), key= lambda x : len(x) )
+            sorted_paths = sorted( list(paths), key= lambda x : -len(x) )
             longest_path = sorted_paths[0]
             return longest_path
         except nx.NetworkXNoPath:
