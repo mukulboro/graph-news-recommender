@@ -16,6 +16,10 @@ class Preference(BaseModel):
     finance: Category
     entertainment: Category
     
+@app.get("/health")
+async def check_health():
+    return True
+    
 
 @app.post("/get-news")
 async def get_news(
