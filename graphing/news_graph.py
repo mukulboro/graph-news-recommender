@@ -198,4 +198,9 @@ class NewsGraph:
             return longest_path
         except nx.NetworkXNoPath:
             return []
+        
+    def export_graph(self):
+        output_file = "graph_with_colors.gexf"
+        nx.write_gexf(self.graph, output_file)
+        
     
