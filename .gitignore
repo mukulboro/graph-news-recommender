@@ -8,3 +8,6 @@ clusters.json
 news_verify.py
 firebase/*.json
 *.gexf
+*.json
+*.png
+generate_rec_json.py

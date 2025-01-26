@@ -30,8 +30,8 @@ class Recommender:
                 news_path = [x for x in news_path if not x.key == pref_news]
                 all_news.extend(news_path)
         all_news = sorted(all_news,key= lambda x : -x.scraped)
-        all_news = [x.key for x in all_news]
-        return list(set(all_news))
+        all_news_processed = [x.key for x in all_news]
+        return list(set(all_news_processed))
     
     def get_all_news(self):
         recommended_news = self.__get_recommended_list()
@@ -44,7 +44,7 @@ class Recommender:
         for news in all_latest_news:
             if news not in all_news:
                 all_news.append(news)
-            if len(all_news) == self.news_no:
+            if len(set(all_news)) == self.news_no:
                 break
         
         return all_news

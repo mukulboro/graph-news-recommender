@@ -64,15 +64,84 @@ class ClusterNews:
             dendrogram(
                 linked,
                 orientation='top',
-                color_threshold= 0.5,
-                # labels=dendrogram_labels,
+                labels=None,
                 distance_sort='descending',
-                show_leaf_counts=True
+                show_leaf_counts=False
             )
             plt.title("Hierarchical Clustering Dendrogram")
             plt.xlabel("News Headlines/Paragraphs")
             plt.ylabel("Distance")
-            plt.savefig("Test.png")
+            plt.savefig("Average.png")
+            plt.clf()
+            
+            
+            distance_matrix = self.__get_difference_matrix()
+            linked = linkage(distance_matrix, 'complete')
+            # Plot dendrogram
+            plt.figure(figsize=(8, 6))
+            dendrogram(
+                linked,
+                orientation='top',
+                labels=None,
+                distance_sort='descending',
+                show_leaf_counts=False
+            )
+            plt.title("Hierarchical Clustering Dendrogram")
+            plt.xlabel("News Headlines/Paragraphs")
+            plt.ylabel("Distance")
+            plt.savefig("Complete.png")
+            plt.clf()
+            
+            distance_matrix = self.__get_difference_matrix()
+            linked = linkage(distance_matrix, 'single')
+            # Plot dendrogram
+            plt.figure(figsize=(8, 6))
+            dendrogram(
+                linked,
+                orientation='top',
+                labels=None,
+                distance_sort='descending',
+                show_leaf_counts=False
+            )
+            plt.title("Hierarchical Clustering Dendrogram")
+            plt.xlabel("News Headlines/Paragraphs")
+            plt.ylabel("Distance")
+            plt.savefig("Single.png")
+            plt.clf()
+            
+            distance_matrix = self.__get_difference_matrix()
+            linked = linkage(distance_matrix, 'weighted')
+            # Plot dendrogram
+            plt.figure(figsize=(8, 6))
+            dendrogram(
+                linked,
+                orientation='top',
+                labels=None,
+                distance_sort='descending',
+                show_leaf_counts=False
+            )
+            plt.title("Hierarchical Clustering Dendrogram")
+            plt.xlabel("News Headlines/Paragraphs")
+            plt.ylabel("Distance")
+            plt.savefig("Weighted.png")
+            plt.clf()
+            
+            distance_matrix = self.__get_difference_matrix()
+            linked = linkage(distance_matrix, 'centroid')
+            # Plot dendrogram
+            plt.figure(figsize=(8, 6))
+            dendrogram(
+                linked,
+                orientation='top',
+                labels=None,
+                distance_sort='descending',
+                show_leaf_counts=False
+            )
+            plt.title("Hierarchical Clustering Dendrogram")
+            plt.xlabel("News Headlines/Paragraphs")
+            plt.ylabel("Distance")
+            plt.savefig("Centroid.png")
+            plt.clf()
         except BaseException as e:
             print("Euta ni news na vayera plot garina hehehe")
         

@@ -37,6 +37,9 @@ class ClusterNode:
     
     def __hash__(self):
         return self.id
+    
+    def __lt__(self, other):
+        return self.scraped < other.scraped
 
 class NewsGraph:
     def __init__(self, 
@@ -196,11 +199,26 @@ class NewsGraph:
             sorted_paths = sorted( list(paths), key= lambda x : -len(x) )
             longest_path = sorted_paths[0]
             return longest_path
-        except nx.NetworkXNoPath:
+        except nx.NetworkXNoPath as e:
+            return []
+        except BaseException as e:
             return []
         
     def export_graph(self):
-        output_file = "graph_with_colors.gexf"
+        self.__load_graph()
+        
+        G_inverted = nx.Graph()
+        
+        G_inverted.add_nodes_from(self.graph.nodes(data=True))
+        
+        for u, v, data in self.graph.edges(data=True):
+            original_weight = data.get('weight', 0)  # Default weight is 0 if not present
+            inverted_weight = 10 - original_weight
+            G_inverted.add_edge(u, v, weight=inverted_weight)
+
+
+        output_file = "graph_with_colors2.gexf"
+        print(output_file)
         nx.write_gexf(self.graph, output_file)
         
     
