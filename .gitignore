@@ -11,3 +11,4 @@ firebase/*.json
 *.json
 *.png
 generate_rec_json.py
+graph_analysis.py
