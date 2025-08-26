@@ -2,21 +2,6 @@
 
 This repository contains the backend code for **Hulaki**, a news aggregator and recommendation system. This project was developed as a 6th-semester project and is the basis for the research paper, "A Novel Approach To News Aggregation and Recommendation Using Clustering Algorithms and Graph Theory."
 
-## 📖 Table of Contents
-- [About the Project](#about-the-project)
-- [Features](#features)
-- [System Architecture](#system-architecture)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-- [Usage](#usage)
-- [Project Structure](#project-structure)
-- [Technology Stack](#technology-stack)
-- [Research Paper](#research-paper)
-- [Contributing](#contributing)
-- [License](#license)
-- [Acknowledgements](#acknowledgements)
-
 ## 📌 About the Project
 
 In an era of information overload, it's challenging to keep up with the news without encountering duplicate stories from different sources. This project aims to solve this problem by:
